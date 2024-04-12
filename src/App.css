@@ -1,0 +1,51 @@
+:root {
+    --contentcolor: #FFFDED;
+    --bgcolor: #FFF8D3;
+    --blockcolor: #A0CED9;
+    --black: #837569;
+    --accent_black: #443d36;
+    --gray: #B5A69A;
+    --strong: #FF7676;
+    --fontsize: 20px;
+}
+
+body {
+    background-color: var(--bgcolor);
+    color: var(--accent_black);
+}
+
+.app {
+    margin: 10px;
+}
+
+.textfield {
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.function {
+    margin-top: 10px;
+    border: solid var(--black);
+    text-align: center;
+    transition: all 0.3s;
+    background-color: var(--contentcolor);
+    cursor: pointer;
+}
+
+.function:hover {
+    transition: all 0.3s;
+    background-color: var(--blockcolor);
+}
+
+.addfunc {
+    margin-top: 10px;
+    background-color: var(--contentcolor);
+    border: solid var(--black);
+    cursor: pointer;
+    text-align: center;
+}
+
+.addfunc:hover {
+    transition: all 0.3s;
+    background-color: var(--blockcolor);
+}
