@@ -26,21 +26,39 @@ body {
 }
 
 .function {
-    margin-top: 10px;
-    border: solid var(--black);
     text-align: center;
+    position: relative;
+    margin: 5px;
+    border: solid var(--black);
+}
+
+.function-button {
     transition: all 0.3s;
     background-color: var(--contentcolor);
     cursor: pointer;
+    padding: 5px;
 }
 
-.function:hover {
+.function-button:hover {
     transition: all 0.3s;
     background-color: var(--blockcolor);
 }
 
+.title {
+    font-size: xx-large;
+    font-weight: bolder;
+}
+
+.delete {
+    position: absolute;
+    color: red;
+    cursor: pointer;
+    top: 5px;
+    right: 5px;
+}
+
 .addfunc {
-    margin-top: 10px;
+    margin: 5px;
     background-color: var(--contentcolor);
     border: solid var(--black);
     cursor: pointer;
@@ -52,9 +70,16 @@ body {
     background-color: var(--blockcolor);
 }
 
-.dialog {
+.outer-dialog {
     width: 80vw;
     height: 80vh;
+    padding: 0;
+}
+
+.dialog {
+    box-sizing: border-box;
+    padding: 10px;
+    height: 100%;
 }
 
 .hintfield {
