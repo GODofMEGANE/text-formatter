@@ -1,6 +1,20 @@
-import React, { Dispatch, SetStateAction, useState, useRef, useEffect } from 'react';
+import React, { Dispatch, SetStateAction, useState, useRef } from 'react';
+import AceEditor from 'react-ace';
+import { IoMdSettings, IoMdCloseCircle } from "react-icons/io";
+import "ace-builds/webpack-resolver";
+import "ace-builds/src-noconflict/mode-javascript";
+import "ace-builds/src-noconflict/theme-solarized_light";
+import "ace-builds/src-noconflict/ext-language_tools";
 
 import './App.css';
+
+export type EditorProps = {
+    fileType: string;
+    contents: string;
+    readOnly: boolean;
+    onChange?: (content: string) => void;
+    theme?: string;
+};
 
 type FunctionType = {
     title: string,
@@ -23,6 +37,7 @@ function loadFunctions(): FunctionType[] {
         return JSON.parse(json_raw, function (k, v) {
             if (k === 'function') {
                 try {
+                    // eslint-disable-next-line
                     return Function("return " + decodeURIComponent(v))();
                 }
                 catch (e) {
@@ -56,45 +71,80 @@ function App() {
     const [functions, setFunctions] = useState<FunctionType[]>(loadFunctions);
 
     const dialog_ref = useRef<HTMLDialogElement>(null);
+    const [replace_index, setReplaceIndex] = useState<number>(-1);
     const [addtitle, setAddtitle] = useState<string>("");
     const [addhint, setAddhint] = useState<string>("");
     const [addscript, setAddscript] = useState<string>("function(text, arg){\n  return text+arg;\n}");
+    const [is_testing, setIsTesting] = useState<boolean>(true);
+
+    function showFunctionDialog(clicked_index: number = -1){
+        if(clicked_index !== -1){
+            setReplaceIndex(clicked_index);
+            setAddtitle(functions[clicked_index].title);
+            setAddhint(functions[clicked_index].hint);
+            setAddscript(functions[clicked_index].function.toString());
+        }
+        dialog_ref.current?.showModal();
+    }
 
     return (
         <div className="app">
-            <textarea className='textfield' value={text} onChange={(evt) => { setText(evt.target.value) }} />
+            <textarea className='textfield' value={text} placeholder='ここに関数を適用させる文字列を入力' onChange={(evt) => { setText(evt.target.value) }} />
             <hr />
-            <Functions text={text} setText={setText} functions={functions} setFunctions={setFunctions} />
+            <Functions text={text} setText={setText} functions={functions} setFunctions={setFunctions} showFunctionDialog={showFunctionDialog} />
             <hr />
-            <div className='addfunc' onClick={() => { dialog_ref.current?.showModal(); }}>関数を追加</div>
+            <div className='addfunc' onClick={() => {
+                showFunctionDialog();
+            }}>関数を追加</div>
             <dialog id='addfunc-dialog' className='outer-dialog' ref={dialog_ref} onClick={() => { dialog_ref.current?.close() }}>
                 <div className='dialog' onClick={(evt) => { evt.stopPropagation(); }}>
                     <input className='titlefield' type='text' placeholder='関数の名前を入力' value={addtitle} onChange={(evt) => { setAddtitle(evt.target.value) }} /><br />
                     <input className='hintfield' type='text' placeholder='関数の説明を入力' value={addhint} onChange={(evt) => { setAddhint(evt.target.value) }} />
-                    <textarea className='scriptfield' value={addscript} onChange={(evt) => { setAddscript(evt.target.value) }} />
+                    <AceEditor className='scriptfield' theme="solarized_light" mode='javascript' minLines={10} maxLines={30} width='100%' setOptions={{
+                        enableBasicAutocompletion: true,
+                        enableLiveAutocompletion: true,
+                        enableSnippets: true,
+                        showLineNumbers: true,
+                        tabSize: 2,
+                    }} value={addscript} onChange={(evt) => { setAddscript(evt) }} />
                     <input className='scriptconfirm' type='button' value='確定' onClick={() => {
                         try {
                             const added_func: FunctionType = {
                                 title: addtitle,
                                 hint: addhint,
+                                // eslint-disable-next-line
                                 function: Function("return " + addscript)(),
                             }
-                            added_func.function("This is Test Executing");
-                            saveFunctions(functions.concat(added_func));
-                            setFunctions(functions.concat(added_func));
+                            if(is_testing){
+                                added_func.function("This is Test Executing");
+                            }
+                            if(replace_index === -1){
+                                saveFunctions(functions.concat(added_func));
+                                setFunctions(functions.concat(added_func));
+                            }
+                            else{
+                                saveFunctions(functions.splice(replace_index, 1, added_func));
+                                setFunctions(functions.splice(replace_index, 1, added_func));
+                            }
                             dialog_ref.current?.close();
                         }
                         catch (e) {
                             alert(`構文エラーが発生しました\n${e}`);
                         }
                     }} />
+                    <label>
+                        <input type="checkbox" checked={is_testing} onChange={(evt)=>{setIsTesting(evt.target.checked)}}/>
+                        確定時にテスト実行
+                    </label>
                 </div>
             </dialog>
         </div>
     );
 }
 
-function Functions({ text, setText, functions, setFunctions }: { text: string, setText: Dispatch<SetStateAction<string>>, functions: FunctionType[], setFunctions: Dispatch<SetStateAction<FunctionType[]>> }) {
+function Functions({ text, setText, functions, setFunctions, showFunctionDialog }: {
+    text: string, setText: Dispatch<SetStateAction<string>>, functions: FunctionType[], setFunctions: Dispatch<SetStateAction<FunctionType[]>>, showFunctionDialog: (replace_index?: number)=>void
+}) {
     function getFunctionArgments(func: (text: string, ...args: any) => string) {
         let args_name = []
         const funcstr = func.toString();
@@ -158,15 +208,18 @@ function Functions({ text, setText, functions, setFunctions }: { text: string, s
         }
         for (let i = 1; i < args_name.length; i++) {
             args.push((
-                <input type='text' key={`${index}-${i}`} value={input_args[index][i - 1]} placeholder={args_name[i]} onClick={(evt) => { evt.stopPropagation(); }} onChange={(evt) => {
-                    let new_input_args = [...input_args];
-                    new_input_args[index][i - 1] = evt.target.value;
-                    setInputArgs(new_input_args);
-                }} />
+                <div key={`func-${index}-${i}`}>
+                    <br/>
+                    <input type='text' value={input_args[index][i - 1]} placeholder={args_name[i]} onClick={(evt) => { evt.stopPropagation(); }} onChange={(evt) => {
+                        let new_input_args = [...input_args];
+                        new_input_args[index][i - 1] = evt.target.value;
+                        setInputArgs(new_input_args);
+                    }} />
+                </div>
             ));
         }
         funcs.push((
-            <div className='function' key={`${index}`}>
+            <div className='function' key={`func-${index}`}>
                 <div className='function-button' onClick={() => {
                     try{
                         let result: string = elm.function(text, ...input_args[index])
@@ -183,10 +236,15 @@ function Functions({ text, setText, functions, setFunctions }: { text: string, s
                     <div className='hint'>{elm.hint}</div>
                     {args}
                 </div>
-                <div className='delete' onClick={() => {
-                    saveFunctions(functions.filter((elm, i) => i !== index));
-                    setFunctions(functions.filter((elm, i) => i !== index));
-                }}>✕</div>
+                <IoMdSettings className='edit' size={'2rem'} onClick={() => {
+                    showFunctionDialog(index);
+                }}/>
+                <IoMdCloseCircle className='delete' size={'2rem'} onClick={() => {
+                    if(window.confirm(`本当に関数 ${functions[index].title} を削除しますか？`)){
+                        saveFunctions(functions.filter((elm, i) => i !== index));
+                        setFunctions(functions.filter((elm, i) => i !== index));
+                    }
+                }}/>
             </div>
         ));
     });

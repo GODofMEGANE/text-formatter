@@ -30,6 +30,7 @@ body {
     position: relative;
     margin: 5px;
     border: solid var(--black);
+    min-height: 5vh;
 }
 
 .function-button {
@@ -37,6 +38,7 @@ body {
     background-color: var(--contentcolor);
     cursor: pointer;
     padding: 5px;
+    min-height: 5vh;
 }
 
 .function-button:hover {
@@ -51,10 +53,28 @@ body {
 
 .delete {
     position: absolute;
-    color: red;
+    color: var(--gray);
     cursor: pointer;
     top: 5px;
     right: 5px;
+}
+
+.delete:hover {
+    transition: all 0.3s;
+    color: red;
+}
+
+.edit {
+    position: absolute;
+    color: var(--gray);
+    cursor: pointer;
+    top: 5px;
+    left: 5px;
+}
+
+.edit:hover {
+    transition: all 0.3s;
+    color: blue;
 }
 
 .addfunc {
@@ -77,6 +97,7 @@ body {
 }
 
 .dialog {
+    background-color: var(--contentcolor);
     box-sizing: border-box;
     padding: 10px;
     height: 100%;
@@ -88,9 +109,9 @@ body {
 }
 
 .scriptfield {
-    margin-top: 1rem;
     box-sizing: border-box;
-    width: 100%;
-    resize: vertical;
-    min-height: 10rem;
+    border: solid var(--black);
+    color: black;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
 }
