@@ -84,6 +84,9 @@ function App() {
             setAddhint(functions[clicked_index].hint);
             setAddscript(functions[clicked_index].function.toString());
         }
+        else{
+            setReplaceIndex(clicked_index);
+        }
         dialog_ref.current?.showModal();
     }
 
