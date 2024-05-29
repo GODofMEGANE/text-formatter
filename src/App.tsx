@@ -126,8 +126,10 @@ function App() {
                                 setFunctions(functions.concat(added_func));
                             }
                             else{
-                                saveFunctions(functions.splice(replace_index, 1, added_func));
-                                setFunctions(functions.splice(replace_index, 1, added_func));
+                                const new_functions: FunctionType[] = [...functions];
+                                new_functions.splice(replace_index, 1, added_func);
+                                saveFunctions(new_functions);
+                                setFunctions(new_functions);
                             }
                             dialog_ref.current?.close();
                         }

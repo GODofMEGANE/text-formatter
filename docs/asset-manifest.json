@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/text-formatter/static/css/main.924eeaa8.css",
-    "main.js": "/text-formatter/static/js/main.e849ed40.js",
+    "main.js": "/text-formatter/static/js/main.9eaea1db.js",
     "worker-xquery.js": "/text-formatter/7a1a62fec334f0f103a8f7126d402e0e.js",
     "worker-javascript.js": "/text-formatter/42971365b635d099414b59fd789a7cde.js",
     "mode-php_laravel_blade.js": "/text-formatter/4ad44868dcc9974337b58e1e722f5d44.js",
@@ -473,10 +473,10 @@
     "d.js": "/text-formatter/c98e74fc97b04fe8bf43dcdff549afcf.js",
     "mode-text.js": "/text-formatter/0ffb18fb70c87335edee31a479f58a43.js",
     "main.924eeaa8.css.map": "/text-formatter/static/css/main.924eeaa8.css.map",
-    "main.e849ed40.js.map": "/text-formatter/static/js/main.e849ed40.js.map"
+    "main.9eaea1db.js.map": "/text-formatter/static/js/main.9eaea1db.js.map"
   },
   "entrypoints": [
     "static/css/main.924eeaa8.css",
-    "static/js/main.e849ed40.js"
+    "static/js/main.9eaea1db.js"
   ]
 }
